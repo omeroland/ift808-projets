@@ -1,0 +1,20 @@
+<Sysmon schemaversion="4.81">
+ <EventFiltering>
+   <RuleGroup name="Detect Container Command" groupRelation="or">
+     <ProcessTerminate onmatch="include">
+        <Rule name="TechniqueID=T1611,TechniqueName=Escape to Host" groupRelation="or">
+          <Image condition="end with">kubectl</Image>
+            <CommandLine condition="contains">nsenter</CommandLine>
+            <CommandLine condition="contains">runc</CommandLine>
+        </Rule>
+     </ProcessTerminate>
+     <ProcessCreate onmatch="include">
+        <Rule name="TechniqueID=T1611,TechniqueName=Escape to Host" groupRelation="or">
+          <Image condition="end with">kubectl</Image>
+            <CommandLine condition="contains">nsenter</CommandLine>
+            <CommandLine condition="contains">runc</CommandLine>
+        </Rule>
+     </ProcessCreate>
+  </RuleGroup>
+</EventFiltering>
+</Sysmon>
